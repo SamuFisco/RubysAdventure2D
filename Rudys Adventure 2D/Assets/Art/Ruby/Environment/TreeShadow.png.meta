@@ -3,7 +3,7 @@ guid: d6817aa5c05e0bc4e920094451c36166
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 13
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -43,12 +43,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -106,211 +106,9 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: TreeShadow_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 341.3333
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b70136d329e913f48a37cc370796f752
-      internalID: -1175474915
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TreeShadow_1
-      rect:
-        serializedVersion: 2
-        x: 170
-        y: 341.3333
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9fc2e467662ea7e4187847a736b06173
-      internalID: 435693901
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TreeShadow_2
-      rect:
-        serializedVersion: 2
-        x: 340
-        y: 341.3333
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b8afb27e1dadec245a41c9d9b20dd4f1
-      internalID: -430926420
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TreeShadow_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 171.33333
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8f9d5fdf5400a0a48bf939b4743deaec
-      internalID: -441107766
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TreeShadow_4
-      rect:
-        serializedVersion: 2
-        x: 170
-        y: 171.33333
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 79a6d880c602f3a4ab62971a5d0ef065
-      internalID: -474368648
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TreeShadow_5
-      rect:
-        serializedVersion: 2
-        x: 340
-        y: 171.33333
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 41bf0c090b5ab9d44b58e54727590f96
-      internalID: 54690594
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TreeShadow_6
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 1.3333282
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a7407f943e5c24849a2cd9a05186d2a5
-      internalID: 1484673329
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TreeShadow_7
-      rect:
-        serializedVersion: 2
-        x: 170
-        y: 1.3333282
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ff6cf9f8ba6a7ab4c96eaa5587031614
-      internalID: 81454700
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: TreeShadow_8
-      rect:
-        serializedVersion: 2
-        x: 340
-        y: 1.3333282
-        width: 170.66667
-        height: 170.66667
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ba87a2db5069e4f42b3b372bc9872b4b
-      internalID: 1052469964
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     physicsShape: []
     bones: []
@@ -321,16 +119,7 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable:
-      TreeShadow_0: -1175474915
-      TreeShadow_1: 435693901
-      TreeShadow_2: -430926420
-      TreeShadow_3: -441107766
-      TreeShadow_4: -474368648
-      TreeShadow_5: 54690594
-      TreeShadow_6: 1484673329
-      TreeShadow_7: 81454700
-      TreeShadow_8: 1052469964
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: FloorGrassToBricksCorner_6
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: -1786034830, guid: 34ba951628518014d93ca783945dfeba, type: 3}
+  m_Sprite: {fileID: 650900799, guid: 3dae11869141e1d46bfa74e4e3b8da22, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
