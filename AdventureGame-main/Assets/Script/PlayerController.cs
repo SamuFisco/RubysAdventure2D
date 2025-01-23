@@ -8,10 +8,13 @@ public class PlayerController : MonoBehaviour
     //Variables relacionadas con el movimiento del jugador
     //Es como el volante y el acelerador de un coche: controlan hacia dónde y a qué velocidad te mueves.
     public InputAction MoveAction;
+    public InputAction _fire;
+    public InputAction _interact;
     private Rigidbody2D rigidbody2d;
     private Vector2 move;
     public float speed = 3.0f;
 
+   
     //Variables relacionadas con el sistema de salud
     //Piensa en la salud como el tanque de combustible: cuando llega a cero, el viaje termina.
     public int maxHealth = 5;
@@ -45,6 +48,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         MoveAction.Enable(); //Habilitar la entrada de movimiento del jugador
+        _fire.Enable();
+        _interact.Enable();
         rigidbody2d = GetComponent<Rigidbody2D>(); //Obtener el componente Rigidbody2D para interacciones físicas
         currentHealth = maxHealth; //Inicializar la salud del jugador al máximo
         animator = GetComponent<Animator>(); //Obtener el componente Animator para las animaciones
@@ -57,7 +62,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         move = MoveAction.ReadValue<Vector2>(); //Leer la entrada de movimiento del jugador
-
+        
         //Actualizar la dirección de movimiento si hay movimiento
         if (!Mathf.Approximately(move.x, 0.0f) || !Mathf.Approximately(move.y, 0.0f))
         {
@@ -97,14 +102,14 @@ public class PlayerController : MonoBehaviour
 
         //Lanzar proyectil con la tecla C
         //Es como arrojar una piedra o disparar una flecha.
-        if (Input.GetKeyDown(KeyCode.C))
+        if (/*Input.GetKeyDown(KeyCode.C)*/ _fire.WasPressedThisFrame() )
         {
             Launch(); //Llamar al método para disparar un proyectil
         }
 
         //Buscar NPC con la tecla X
         //Como pedir ayuda o interactuar con alguien delante de ti.
-        if (Input.GetKeyDown(KeyCode.X))
+        if (/*Input.GetKeyDown(KeyCode.X)*/ _interact.WasPressedThisFrame() )
         {
             FindFriend(); //Llamar al método para interactuar con un NPC
         }
