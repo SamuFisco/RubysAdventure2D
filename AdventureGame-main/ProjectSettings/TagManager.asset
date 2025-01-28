@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Enemy
   - Projectil
+  - NPC1
+  - NPC2
   layers:
   - Default
   - TransparentFX
