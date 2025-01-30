@@ -7,46 +7,46 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    // 🎮 Controles del jugador (Movimiento, Disparo, Interacción)
+    //Controles del jugador (Movimiento, Disparo, Interacción)
     public InputAction MoveAction; // Acción para mover al personaje
     public InputAction _fire; // Acción para disparar
     public InputAction _interact; // Acción para interactuar con NPCs
 
-    private Rigidbody2D rigidbody2d; // 💪 Cuerpo del jugador, como el chasis de un coche que recibe movimiento
-    private Vector2 move; // 📍 Dirección en la que se mueve el jugador
-    public float speed = 3.0f; // 🚗 Velocidad del jugador
+    private Rigidbody2D rigidbody2d; //Cuerpo del jugador, como el chasis de un coche que recibe movimiento
+    private Vector2 move; //Dirección en la que se mueve el jugador
+    public float speed = 3.0f; //Velocidad del jugador
 
-    // ❤️ Sistema de salud del jugador
+    //Sistema de salud del jugador
     public int maxHealth = 5; // Salud máxima del jugador
     public int health { get { return currentHealth; } } // Propiedad para obtener la salud actual
     private int currentHealth; // Salud actual del jugador
 
     public float timeInvincible = 2.0f; // ⏳ Tiempo de invulnerabilidad tras recibir daño
-    private bool isInvincible; // 🛡️ Indica si el jugador es invulnerable
-    private float damageCooldown; // ⏳ Contador del tiempo de invulnerabilidad
+    private bool isInvincible; //Indica si el jugador es invulnerable
+    private float damageCooldown; //Contador del tiempo de invulnerabilidad
 
-    private Animator animator; // 🎭 Controlador de animaciones del personaje
+    private Animator animator; //Controlador de animaciones del personaje
     private Vector2 moveDirection = new Vector2(1, 0); // 📍 Dirección en la que el jugador está mirando
 
-    // 🔫 Proyectiles y disparo
+    //Proyectiles y disparo
     public GameObject projectilePrefab; // Prefab del proyectil que dispara el jugador
-    public float projectileForce = 500f; // 💥 Fuerza con la que el proyectil es disparado
+    public float projectileForce = 500f; //Fuerza con la que el proyectil es disparado
 
-    // 🔊 Audio
-    private AudioSource audioSource; // 📢 Fuente de sonido para el jugador
-    public AudioClip damageSound; // 🔊 Sonido de daño
-    public AudioClip walkSound; // 🎵 Sonido al caminar
-    public float damageSoundVolume = 1.0f; // 🔊 Volumen del sonido de daño
-    public float walkSoundVolume = 1.0f; // 🎵 Volumen del sonido al caminar
+    //Audio
+    private AudioSource audioSource; //Fuente de sonido para el jugador
+    public AudioClip damageSound; //Sonido de daño
+    public AudioClip walkSound; //Sonido al caminar
+    public float damageSoundVolume = 1.0f; //Volumen del sonido de daño
+    public float walkSoundVolume = 1.0f; //Volumen del sonido al caminar
 
     void Start()
     {
-        // 🔄 Activa las acciones del jugador (teclado y mando)
+        //Activa las acciones del jugador (teclado y mando)
         MoveAction.Enable();
         _fire.Enable();
         _interact.Enable();
 
-        // 📌 Obtiene componentes esenciales
+        //Obtiene componentes esenciales
         rigidbody2d = GetComponent<Rigidbody2D>(); // Obtiene el Rigidbody2D
         currentHealth = maxHealth; // 💖 Inicializa la salud del jugador al máximo
         animator = GetComponent<Animator>(); // Obtiene el Animator
@@ -55,32 +55,32 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 📍 Captura el movimiento del jugador
+        // Captura el movimiento del jugador
         move = MoveAction.ReadValue<Vector2>();
 
-        // 📏 Si el jugador se está moviendo, actualiza la dirección en la que mira
+        // Si el jugador se está moviendo, actualiza la dirección en la que mira
         if (!Mathf.Approximately(move.x, 0.0f) || !Mathf.Approximately(move.y, 0.0f))
         {
             moveDirection.Set(move.x, move.y);
             moveDirection.Normalize(); // Normaliza la dirección (para que siempre sea de longitud 1)
         }
 
-        // 🎭 Actualiza los parámetros de la animación (dirección y velocidad)
+        // Actualiza los parámetros de la animación (dirección y velocidad)
         animator.SetFloat("Look X", moveDirection.x);
         animator.SetFloat("Look Y", moveDirection.y);
         animator.SetFloat("Speed", move.magnitude);
 
-        // ⏳ Reduce el tiempo de invulnerabilidad si está activo
+        //Reduce el tiempo de invulnerabilidad si está activo
         if (isInvincible)
         {
             damageCooldown -= Time.deltaTime;
             if (damageCooldown < 0)
             {
-                isInvincible = false; // 🔓 Vuelve a ser vulnerable
+                isInvincible = false; //Vuelve a ser vulnerable
             }
         }
 
-        // 🎵 Si el jugador se mueve, reproduce el sonido de caminar
+        //Si el jugador se mueve, reproduce el sonido de caminar
         if (move.magnitude > 0.1f && audioSource != null && !audioSource.isPlaying)
         {
             if (walkSound != null)
@@ -89,13 +89,13 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // 🔫 Si el jugador presiona el botón de disparo, lanza un proyectil
+        //Si el jugador presiona el botón de disparo, lanza un proyectil
         if (_fire.WasPressedThisFrame())
         {
             Launch();
         }
 
-        // 🤝 Si el jugador presiona el botón de interactuar, busca NPCs cercanos
+        // Si el jugador presiona el botón de interactuar, busca NPCs cercanos
         if (_interact.WasPressedThisFrame())
         {
             FindFriend();
@@ -104,21 +104,21 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // 🏃 Mueve al jugador en la dirección deseada con una velocidad constante
+        //Mueve al jugador en la dirección deseada con una velocidad constante
         Vector2 position = rigidbody2d.position + move * speed * Time.deltaTime;
         rigidbody2d.MovePosition(position);
     }
 
     public void ChangeHealth(int amount)
     {
-        // 💥 Si el daño es negativo, verifica si el jugador es invulnerable
+        //Si el daño es negativo, verifica si el jugador es invulnerable
         if (amount < 0)
         {
-            if (isInvincible) return; // ⛔ No recibe daño si es invulnerable
+            if (isInvincible) return; //No recibe daño si es invulnerable
 
             isInvincible = true;
             damageCooldown = timeInvincible;
-            animator.SetTrigger("Hit"); // 🎭 Activa la animación de daño
+            animator.SetTrigger("Hit"); //Activa la animación de daño
 
             if (damageSound != null)
             {
@@ -126,13 +126,13 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // 💖 Ajusta la salud del jugador dentro de los límites
+        // Ajusta la salud del jugador dentro de los límites
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         UIHandler1.instance.SetHealthValue(currentHealth / (float)maxHealth);
 
         Debug.Log("Vida actual: " + currentHealth);
 
-        // ☠️ Si la salud llega a 0, reinicia la partida
+        //Si la salud llega a 0, reinicia la partida
         if (currentHealth <= 0)
         {
             Debug.Log("¡Jugador sin vida! Reiniciando partida...");
@@ -142,7 +142,7 @@ public class PlayerController : MonoBehaviour
 
     void RestartGame()
     {
-        StartCoroutine(RestartCoroutine()); // ⏳ Espera antes de reiniciar la escena
+        StartCoroutine(RestartCoroutine()); //Espera antes de reiniciar la escena
     }
 
     IEnumerator RestartCoroutine()
@@ -153,12 +153,12 @@ public class PlayerController : MonoBehaviour
 
     void Launch()
     {
-        // 🎯 Instancia un proyectil en la dirección en la que el jugador está mirando
+        //Instancia un proyectil en la dirección en la que el jugador está mirando
         GameObject projectileObject = Instantiate(projectilePrefab,
                                     rigidbody2d.position + Vector2.up * 0.5f,
                                     Quaternion.identity);
 
-        // 🚀 Aplica fuerza al proyectil
+        // Aplica fuerza al proyectil
         Rigidbody2D projectileRb = projectileObject.GetComponent<Rigidbody2D>();
         if (projectileRb != null)
         {
@@ -169,12 +169,12 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("El proyectil no tiene un Rigidbody2D asignado.");
         }
 
-        animator.SetTrigger("Launch"); // 🎭 Activa la animación de disparo
+        animator.SetTrigger("Launch"); //Activa la animación de disparo
     }
 
     void FindFriend()
     {
-        // 🔍 Lanza un rayo en la dirección del jugador para encontrar NPCs
+        // Lanza un rayo en la dirección del jugador para encontrar NPCs
         RaycastHit2D hit = Physics2D.Raycast(rigidbody2d.position + Vector2.up * 0.2f,
                                              moveDirection,
                                              1.5f,

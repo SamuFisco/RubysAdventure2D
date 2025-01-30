@@ -1,9 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class EnemyController : MonoBehaviour
 {
+    public static EnemiesContainer Instance; //Singleton para acceso global
+    //[SerializeField] private Text enemiesAliveText;  //OJO
+    //[SerializeField] private Text enemiesTotalText; //OJO
+    private int enemiesAlive = 0;
+    //private int enemiesTotal = 0;
     //Variables públicas
     public float speed;            // Velocidad de movimiento del enemigo
     public bool vertical;          // Si es verdadero, el enemigo se mueve en el eje Y
@@ -109,6 +116,11 @@ public class EnemyController : MonoBehaviour
     {
         // Ya no está roto
         broken = false;
+        
+       if (enemiesAlive < 0) //OJO si es mayor que cero
+           enemiesAlive--; //Restar enemigo
+
+
         // No responde más a la física
         rigidbody2d.simulated = false;
         // Disparamos la animación de estar arreglado
