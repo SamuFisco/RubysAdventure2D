@@ -6,7 +6,7 @@ using TMPro;
 
 public class EnemyController : MonoBehaviour
 {
-    public static EnemiesContainer Instance; //Singleton para acceso global
+    public static EnemyController Instance; //Singleton para acceso global
     //[SerializeField] private Text enemiesAliveText;  //OJO
     //[SerializeField] private Text enemiesTotalText; //OJO
     private int enemiesAlive = 0;
