@@ -29,6 +29,8 @@ public class EnemyController : MonoBehaviour
     //Start se llama al comenzar la ejecución (como encender el motor de un coche)
     void Start()
     {
+        EnemiesContainer.Instance.AddEnemy();
+
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         timer = changeTime;
@@ -116,15 +118,16 @@ public class EnemyController : MonoBehaviour
     {
         // Ya no está roto
         broken = false;
-        
-       if (enemiesAlive < 0) //OJO si es mayor que cero
-           enemiesAlive--; //Restar enemigo
+
+        EnemiesContainer.Instance.RemoveEnemy();
+
 
 
         // No responde más a la física
         rigidbody2d.simulated = false;
         // Disparamos la animación de estar arreglado
         animator.SetTrigger("Fixed");
+       // gameObject.GetComponent<EnemyC>().Fix();
 
         // Si hay efecto de humo, lo detenemos
         if (smokeEffect != null)
