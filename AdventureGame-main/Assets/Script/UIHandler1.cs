@@ -1,137 +1,122 @@
 using System.Collections;
-
 using System.Collections.Generic;
-
 using UnityEngine;
-
 using UnityEngine.UIElements;
 
-
-
 public class UIHandler1 : MonoBehaviour
-
 {
-
-    //m_Healthbar es como el indicador de combustible: muestra la "vida" disponible
-
     private VisualElement m_Healthbar;
-
-
-
-    //Una referencia estática (instance) similar a un punto de encuentro global: todos pueden llamarla
-
     public static UIHandler1 instance { get; private set; }
 
-
-
-    //Variables para la ventana de diálogo
-
-    //El displayTime es como el tiempo que estará encendida una luz de alerta en el tablero
-
     public float displayTime = 4.0f;
+    private VisualElement m_NonPlayerDialogue;
+    private Label npcDialogueText;
+    private float m_TimerDisplay;
 
-    private VisualElement m_NonPlayerDialogue; //La ventana de diálogo, como un aviso emergente
-
-    private float m_TimerDisplay;             //Contador para cerrar el aviso tras unos segundos
-
-
-
-    //Awake se llama al cargar el script, como poner un marcador para identificar que este objeto es el principal
+    private bool firstTimeNPC1 = true;
 
     private void Awake()
-
     {
-
         instance = this;
-
     }
-
-
-
-    //Start se llama antes del primer frame, como encender la consola central y preparar los indicadores
 
     private void Start()
-
     {
-
-        //Obtenemos el UIDocument para interactuar con la interfaz
-
+        // Obtener el UI Document correctamente
         UIDocument uiDocument = GetComponent<UIDocument>();
-
-
-
-        //Buscamos el elemento "HealthBar" en la UI, como encontrar la barra de combustible en un panel
-
-        m_Healthbar = uiDocument.rootVisualElement.Q<VisualElement>("HealthBar");
-
-        SetHealthValue(1.0f); //Inicializamos la barra al 100%
-
-
-
-        //Buscamos la ventana de diálogo (NPCDialogue), como un aviso que se muestra si necesitas un mensaje emergente
-
-        m_NonPlayerDialogue = uiDocument.rootVisualElement.Q<VisualElement>("NPCDialogue");
-
-        m_NonPlayerDialogue.style.display = DisplayStyle.None; //Está oculta inicialmente
-
-        m_TimerDisplay = -1.0f; //Usamos valor negativo para indicar que no está mostrando diálogo
-
-    }
-
-
-
-    //Update se llama en cada frame, como revisar continuamente si hay que ocultar la ventana
-
-    private void Update()
-
-    {
-
-        //Si el temporizador está activo (mayor que 0), reducimos el tiempo
-
-        if (m_TimerDisplay > 0)
-
+        if (uiDocument == null)
         {
-
-            m_TimerDisplay -= Time.deltaTime;
-
-            //Si se acaba el tiempo, ocultamos la ventana
-
-            if (m_TimerDisplay < 0)
-
-            {
-
-                m_NonPlayerDialogue.style.display = DisplayStyle.None;
-
-            }
-
+            Debug.LogError("UIHandler1: No se encontró UIDocument en este GameObject.");
+            return;
         }
 
+        // Inicializar la barra de salud
+        m_Healthbar = uiDocument.rootVisualElement.Q<VisualElement>("HealthBar");
+        if (m_Healthbar == null)
+        {
+            Debug.LogError("UIHandler1: No se encontró 'HealthBar' en el UI Document.");
+        }
+        else
+        {
+            SetHealthValue(1.0f);
+        }
+
+        // Obtener el NPCDialogue correctamente
+        m_NonPlayerDialogue = uiDocument.rootVisualElement.Q<VisualElement>("NPCDialogue");
+        if (m_NonPlayerDialogue == null)
+        {
+            Debug.LogError("UIHandler1: No se encontró 'NPCDialogue' en la UI.");
+            return;
+        }
+
+        // Obtener el Label que mostrará el texto del NPC
+        npcDialogueText = m_NonPlayerDialogue.Q<Label>("DialogueText");
+        if (npcDialogueText == null)
+        {
+            Debug.LogError("UIHandler1: 'DialogueText' no se encontró dentro de 'NPCDialogue'. Asegúrate de agregarlo en UI Builder.");
+            return;
+        }
+
+        // Asegurar que el diálogo inicie oculto
+        m_NonPlayerDialogue.style.display = DisplayStyle.None;
+        m_TimerDisplay = -1.0f;
     }
 
-
-
-    //Actualizamos el ancho de la barra de salud, es como mover la aguja del indicador de gasolina en el tablero
+    private void Update()
+    {
+        if (m_TimerDisplay > 0)
+        {
+            m_TimerDisplay -= Time.deltaTime;
+            if (m_TimerDisplay <= 0)
+            {
+                m_NonPlayerDialogue.style.display = DisplayStyle.None;
+            }
+        }
+    }
 
     public void SetHealthValue(float percentage)
-
     {
-
-        m_Healthbar.style.width = Length.Percent(100 * percentage);
-
+        if (m_Healthbar != null)
+        {
+            m_Healthbar.style.width = Length.Percent(100 * percentage);
+        }
+        else
+        {
+            Debug.LogError("UIHandler1: No se puede actualizar la barra de salud porque es NULL.");
+        }
     }
 
-
-
-    //Muestra el diálogo del NPC por un tiempo limitado, como encender una luz de alerta por unos segundos
-
-    public void DisplayDialogue()
-
+    public void DisplayDialogueNPC2()
     {
+        Debug.Log("NPC2 ACTIVADO - Mostrando su diálogo");
 
-        m_NonPlayerDialogue.style.display = DisplayStyle.Flex; //Hacer visible la ventana
+        if (m_NonPlayerDialogue == null || npcDialogueText == null)
+        {
+            Debug.LogError("UIHandler1: No se puede mostrar el diálogo de NPC1 porque 'NPCDialogue' o 'DialogueText' es NULL.");
+            return;
+        }
 
-        m_TimerDisplay = displayTime; //Reiniciar el contador de tiempo
+        m_NonPlayerDialogue.style.display = DisplayStyle.Flex;
+        npcDialogueText.text = firstTimeNPC1
+            ? "¡Hola, Ruby! He oído que hay muchas máquinas descompuestas por aquí. Sería genial si pudieras\r\nayudarnos a repararlas. Usa tu tuerca mágica para hacerlo, y no olvides presionar la tecla \"C\" \r\npara lanzarla. ¡Buena suerte, arreglarlas tiene premio!"
+            : "Recuerda que cuentas con 5 vidas, si las pierdes vuelves al inicio";
 
+        firstTimeNPC1 = false;
+        m_TimerDisplay = displayTime;
     }
 
+    public void DisplayDialogueNPC1()
+    {
+        Debug.Log("NPC1 ACTIVADO - Mostrando su diálogo");
+
+        if (m_NonPlayerDialogue == null || npcDialogueText == null)
+        {
+            Debug.LogError("UIHandler1: No se puede mostrar el diálogo de NPC2 porque 'NPCDialogue' o 'DialogueText' es NULL.");
+            return;
+        }
+
+        m_NonPlayerDialogue.style.display = DisplayStyle.Flex;
+        npcDialogueText.text = "La recompensa de arreglar las máquinas no desaparece, recuerdalo.";
+        m_TimerDisplay = displayTime;
+    }
 }

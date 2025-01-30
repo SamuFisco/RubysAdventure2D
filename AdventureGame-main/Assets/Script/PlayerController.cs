@@ -1,437 +1,222 @@
-using System.Collections;
-
+Ôªøusing System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
-
 using UnityEngine.InputSystem;
-
-
+using UnityEngine.SceneManagement;
+//using UnityEngine.SceneManager; // Para reiniciar la partida
 
 public class PlayerController : MonoBehaviour
-
 {
+    // üéÆ Controles del jugador (Movimiento, Disparo, Interacci√≥n)
+    public InputAction MoveAction; // Acci√≥n para mover al personaje
+    public InputAction _fire; // Acci√≥n para disparar
+    public InputAction _interact; // Acci√≥n para interactuar con NPCs
 
-    //Variables relacionadas con el movimiento del jugador
+    private Rigidbody2D rigidbody2d; // üí™ Cuerpo del jugador, como el chasis de un coche que recibe movimiento
+    private Vector2 move; // üìç Direcci√≥n en la que se mueve el jugador
+    public float speed = 3.0f; // üöó Velocidad del jugador
 
-    //Es como el volante y el acelerador de un coche: controlan hacia dÛnde y a quÈ velocidad te mueves.
+    // ‚ù§Ô∏è Sistema de salud del jugador
+    public int maxHealth = 5; // Salud m√°xima del jugador
+    public int health { get { return currentHealth; } } // Propiedad para obtener la salud actual
+    private int currentHealth; // Salud actual del jugador
 
-    public InputAction MoveAction;
+    public float timeInvincible = 2.0f; // ‚è≥ Tiempo de invulnerabilidad tras recibir da√±o
+    private bool isInvincible; // üõ°Ô∏è Indica si el jugador es invulnerable
+    private float damageCooldown; // ‚è≥ Contador del tiempo de invulnerabilidad
 
-    public InputAction _fire;
+    private Animator animator; // üé≠ Controlador de animaciones del personaje
+    private Vector2 moveDirection = new Vector2(1, 0); // üìç Direcci√≥n en la que el jugador est√° mirando
 
-    public InputAction _interact;
+    // üî´ Proyectiles y disparo
+    public GameObject projectilePrefab; // Prefab del proyectil que dispara el jugador
+    public float projectileForce = 500f; // üí• Fuerza con la que el proyectil es disparado
 
-    private Rigidbody2D rigidbody2d;
-
-    private Vector2 move;
-
-    public float speed = 3.0f;
-
-
-
-
-
-    //Variables relacionadas con el sistema de salud
-
-    //Piensa en la salud como el tanque de combustible: cuando llega a cero, el viaje termina.
-
-    public int maxHealth = 5;
-
-    public int health { get { return currentHealth; } }
-
-    private int currentHealth;
-
-
-
-    //Variables relacionadas con la invencibilidad temporal
-
-    //Es como un escudo pasajero que te protege un tiempo y despuÈs se desactiva.
-
-    public float timeInvincible = 2.0f;
-
-    private bool isInvincible;
-
-    private float damageCooldown;
-
-
-
-    //Variables relacionadas con la animaciÛn
-
-    //Es como el panel de control que muestra en quÈ estado est· el jugador (caminando, atacando, recibiendo daÒo).
-
-    private Animator animator;
-
-    private Vector2 moveDirection = new Vector2(1, 0);
-
-
-
-    //Variables relacionadas con el proyectil
-
-    //Piensa en el proyectil como un disparo o piedra que lanzas para atacar a distancia.
-
-    public GameObject projectilePrefab;
-
-
-
-    //Variables relacionadas con el audio
-
-    //AudioSource es como la radio del coche: aquÌ reproduces canciones (efectos de sonido en este caso).
-
-    private AudioSource audioSource;
-
-    public AudioClip damageSound; //Sonido que se reproduce cuando el jugador recibe daÒo
-
-    public float damageSoundVolume = 1.0f; //Volumen para el sonido de daÒo
-
-    public float walkSoundVolume = 1.0f; //Volumen para el sonido al caminar
-
-
-
-    //Se llama antes de que comience el primer frame
-
-    //Es como encender el coche y revisar los sistemas b·sicos.
+    // üîä Audio
+    private AudioSource audioSource; // üì¢ Fuente de sonido para el jugador
+    public AudioClip damageSound; // üîä Sonido de da√±o
+    public AudioClip walkSound; // üéµ Sonido al caminar
+    public float damageSoundVolume = 1.0f; // üîä Volumen del sonido de da√±o
+    public float walkSoundVolume = 1.0f; // üéµ Volumen del sonido al caminar
 
     void Start()
-
     {
-
-        MoveAction.Enable(); //Habilitar la entrada de movimiento del jugador
-
+        // üîÑ Activa las acciones del jugador (teclado y mando)
+        MoveAction.Enable();
         _fire.Enable();
-
         _interact.Enable();
 
-        rigidbody2d = GetComponent<Rigidbody2D>(); //Obtener el componente Rigidbody2D para interacciones fÌsicas
-
-        currentHealth = maxHealth; //Inicializar la salud del jugador al m·ximo
-
-        animator = GetComponent<Animator>(); //Obtener el componente Animator para las animaciones
-
-        audioSource = GetComponent<AudioSource>(); //Obtener el componente AudioSource para la reproducciÛn de audio
-
-        audioSource.volume = walkSoundVolume; //Ajustar el volumen del sonido de caminar
-
+        // üìå Obtiene componentes esenciales
+        rigidbody2d = GetComponent<Rigidbody2D>(); // Obtiene el Rigidbody2D
+        currentHealth = maxHealth; // üíñ Inicializa la salud del jugador al m√°ximo
+        animator = GetComponent<Animator>(); // Obtiene el Animator
+        audioSource = GetComponent<AudioSource>(); // Obtiene el AudioSource
     }
-
-
-
-    //Se llama en cada frame
-
-    //Es como verificar constantemente hacia dÛnde est· girando el volante y cu·nto aceleras.
 
     void Update()
-
     {
+        // üìç Captura el movimiento del jugador
+        move = MoveAction.ReadValue<Vector2>();
 
-        move = MoveAction.ReadValue<Vector2>(); //Leer la entrada de movimiento del jugador
-
-
-
-        //Actualizar la direcciÛn de movimiento si hay movimiento
-
+        // üìè Si el jugador se est√° moviendo, actualiza la direcci√≥n en la que mira
         if (!Mathf.Approximately(move.x, 0.0f) || !Mathf.Approximately(move.y, 0.0f))
-
         {
-
-            moveDirection.Set(move.x, move.y); //Establecer la direcciÛn basada en la entrada
-
-            moveDirection.Normalize(); //Normalizar el vector de direcciÛn para mantener un movimiento consistente
-
+            moveDirection.Set(move.x, move.y);
+            moveDirection.Normalize(); // Normaliza la direcci√≥n (para que siempre sea de longitud 1)
         }
 
+        // üé≠ Actualiza los par√°metros de la animaci√≥n (direcci√≥n y velocidad)
+        animator.SetFloat("Look X", moveDirection.x);
+        animator.SetFloat("Look Y", moveDirection.y);
+        animator.SetFloat("Speed", move.magnitude);
 
-
-        //Enviar valores al Animator
-
-        animator.SetFloat("Look X", moveDirection.x); //Actualizar la direcciÛn X en el animator
-
-        animator.SetFloat("Look Y", moveDirection.y); //Actualizar la direcciÛn Y en el animator
-
-        animator.SetFloat("Speed", move.magnitude); //Actualizar el par·metro de velocidad en el animator
-
-
-
-        //Manejo de la invencibilidad temporal
-
-        //Como un escudo que desaparece con el tiempo.
-
+        // ‚è≥ Reduce el tiempo de invulnerabilidad si est√° activo
         if (isInvincible)
-
         {
-
-            damageCooldown -= Time.deltaTime; //Reducir el tiempo de invencibilidad
-
+            damageCooldown -= Time.deltaTime;
             if (damageCooldown < 0)
-
             {
-
-                isInvincible = false; //Deshabilitar la invencibilidad cuando termine el tiempo
-
+                isInvincible = false; // üîì Vuelve a ser vulnerable
             }
-
         }
 
-
-
-        //Sonido al caminar
-
-        //Si te mueves, es como el ruido de pasos que haces. Si te paras, lo dejas de hacer.
-
-        if (move.magnitude > 0.1f && !audioSource.isPlaying)
-
+        // üéµ Si el jugador se mueve, reproduce el sonido de caminar
+        if (move.magnitude > 0.1f && audioSource != null && !audioSource.isPlaying)
         {
-
-            audioSource.loop = true; //Habilitar el bucle para el sonido continuo de caminar
-
-            audioSource.volume = walkSoundVolume; //Ajustar el volumen del sonido de caminar
-
-            audioSource.Play(); //Reproducir el sonido de caminar
-
+            if (walkSound != null)
+            {
+                audioSource.PlayOneShot(walkSound, walkSoundVolume);
+            }
         }
 
-        else if (move.magnitude <= 0.1f && audioSource.isPlaying)
-
+        // üî´ Si el jugador presiona el bot√≥n de disparo, lanza un proyectil
+        if (_fire.WasPressedThisFrame())
         {
-
-            audioSource.loop = false; //Detener el bucle cuando el jugador deja de moverse
-
-            audioSource.Stop(); //Detener el sonido de caminar
-
+            Launch();
         }
 
-
-
-        //Lanzar proyectil con la tecla C
-
-        //Es como arrojar una piedra o disparar una flecha.
-
-        if (/*Input.GetKeyDown(KeyCode.C)*/ _fire.WasPressedThisFrame())
-
+        // ü§ù Si el jugador presiona el bot√≥n de interactuar, busca NPCs cercanos
+        if (_interact.WasPressedThisFrame())
         {
-
-            Launch(); //Llamar al mÈtodo para disparar un proyectil
-
+            FindFriend();
         }
-
-
-
-        //Buscar NPC con la tecla X
-
-        //Como pedir ayuda o interactuar con alguien delante de ti.
-
-        if (/*Input.GetKeyDown(KeyCode.X)*/ _interact.WasPressedThisFrame())
-
-        {
-
-            FindFriend(); //Llamar al mÈtodo para interactuar con un NPC
-
-        }
-
     }
-
-
-
-    //Se llama a la misma tasa que el sistema de fÌsica
-
-    //Como ajustar la posiciÛn del coche seg˙n el volante y el acelerador de forma suave.
 
     void FixedUpdate()
-
     {
-
-        Vector2 position = rigidbody2d.position + move * speed * Time.deltaTime; //Calcular la nueva posiciÛn basada en la entrada y la velocidad
-
-        rigidbody2d.MovePosition(position); //Mover al jugador a la nueva posiciÛn
-
+        // üèÉ Mueve al jugador en la direcci√≥n deseada con una velocidad constante
+        Vector2 position = rigidbody2d.position + move * speed * Time.deltaTime;
+        rigidbody2d.MovePosition(position);
     }
-
-
 
     public void ChangeHealth(int amount)
-
     {
-
-        //Si el jugador recibe daÒo
-
-        //Es como quitar combustible del tanque cuando te golpean.
-
+        // üí• Si el da√±o es negativo, verifica si el jugador es invulnerable
         if (amount < 0)
-
         {
+            if (isInvincible) return; // ‚õî No recibe da√±o si es invulnerable
 
-            if (isInvincible)
-
-            {
-
-                return; //Ignorar el daÒo si el jugador es invencible
-
-            }
-
-            isInvincible = true; //Habilitar la invencibilidad
-
-            damageCooldown = timeInvincible; //Restablecer el tiempo de invencibilidad
-
-            animator.SetTrigger("Hit"); //Activar la animaciÛn de daÒo
-
-
-
-            //Reproducir sonido de daÒo
-
-            //Como un quejido al recibir un golpe.
+            isInvincible = true;
+            damageCooldown = timeInvincible;
+            animator.SetTrigger("Hit"); // üé≠ Activa la animaci√≥n de da√±o
 
             if (damageSound != null)
-
             {
-
-                audioSource.PlayOneShot(damageSound, damageSoundVolume); //Reproducir el sonido de daÒo con volumen ajustable
-
+                audioSource.PlayOneShot(damageSound, damageSoundVolume);
             }
-
         }
 
-
-
-        //Actualizar la salud
-
-        //Mantener el rango de salud entre 0 y el m·ximo, como un tanque de gasolina que no puede pasar de su capacidad.
-
+        // üíñ Ajusta la salud del jugador dentro de los l√≠mites
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-
-
-
-        //Actualizar la barra de salud en la UI
-
-        //Como mover la aguja del indicador de combustible.
-
         UIHandler1.instance.SetHealthValue(currentHealth / (float)maxHealth);
 
+        Debug.Log("Vida actual: " + currentHealth);
+
+        // ‚ò†Ô∏è Si la salud llega a 0, reinicia la partida
+        if (currentHealth <= 0)
+        {
+            Debug.Log("¬°Jugador sin vida! Reiniciando partida...");
+            RestartGame();
+        }
     }
 
+    void RestartGame()
+    {
+        StartCoroutine(RestartCoroutine()); // ‚è≥ Espera antes de reiniciar la escena
+    }
 
-
-    //Instanciar y lanzar el proyectil
-
-    //Como arrojar una piedra o disparar un proyectil desde tu posiciÛn.
+    IEnumerator RestartCoroutine()
+    {
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 
     void Launch()
-
     {
-
+        // üéØ Instancia un proyectil en la direcci√≥n en la que el jugador est√° mirando
         GameObject projectileObject = Instantiate(projectilePrefab,
-
                                     rigidbody2d.position + Vector2.up * 0.5f,
-
                                     Quaternion.identity);
 
-
-
-        //Usar la clase Projectil, no Projectile
-
-        //Como verificar que la piedra lanzada sea del tipo correcto.
-
-        Projectil projectile = projectileObject.GetComponent<Projectil>();
-
-        if (projectile != null)
-
+        // üöÄ Aplica fuerza al proyectil
+        Rigidbody2D projectileRb = projectileObject.GetComponent<Rigidbody2D>();
+        if (projectileRb != null)
         {
-
-            projectile.Launch(moveDirection, 300); //Lanzar el proyectil en la direcciÛn especificada con fuerza
-
+            projectileRb.AddForce(moveDirection * projectileForce);
+        }
+        else
+        {
+            Debug.LogError("El proyectil no tiene un Rigidbody2D asignado.");
         }
 
-
-
-        animator.SetTrigger("Launch"); //Activar la animaciÛn de disparo
-
+        animator.SetTrigger("Launch"); // üé≠ Activa la animaci√≥n de disparo
     }
 
-
-
-    //Buscar NPC frente al jugador
-
-    //Como mirar al frente para ver si hay alguien con quien interactuar.
-
     void FindFriend()
-
     {
-
+        // üîç Lanza un rayo en la direcci√≥n del jugador para encontrar NPCs
         RaycastHit2D hit = Physics2D.Raycast(rigidbody2d.position + Vector2.up * 0.2f,
-
                                              moveDirection,
-
                                              1.5f,
-
                                              LayerMask.GetMask("NPC"));
 
         if (hit.collider != null)
-
         {
-
-            //Usar la clase NonPlayerCharacter1, no NonPlayerCharacter
-
-            //Como verificar si el objeto frente a ti es realmente un NPC.
-
-            NonPlayerCharacter1 character = hit.collider.GetComponent<NonPlayerCharacter1>();
-
-            if (character != null)
-
+            NPC1 npc1 = hit.collider.GetComponent<NPC1>();
+            if (npc1 != null)
             {
-
-                UIHandler1.instance.DisplayDialogue(); //Mostrar el di·logo en la UI
-
+                Debug.Log("Jugador interactuando con NPC1");
+                UIHandler1.instance.DisplayDialogueNPC1();
+                return;
             }
 
+            NPC2 npc2 = hit.collider.GetComponent<NPC2>();
+            if (npc2 != null)
+            {
+                Debug.Log("Jugador interactuando con NPC2");
+                UIHandler1.instance.DisplayDialogueNPC2();
+                return;
+            }
         }
-
     }
-
-
-
-    //FunciÛn para reproducir un efecto de sonido ˙nico
-
-    //Como pulsar una bocina puntual, sin mantenerlo en bucle.
 
     public void PlaySound(AudioClip clip)
-
     {
-
         if (clip != null)
-
         {
-
-            audioSource.PlayOneShot(clip); //Reproducir el efecto de sonido una vez
-
+            audioSource.PlayOneShot(clip);
         }
-
         else
-
         {
-
-            Debug.LogWarning("AudioClip no asignado."); //Advertir si no se ha asignado un AudioClip
-
+            Debug.LogWarning("AudioClip no asignado.");
         }
-
     }
-
-
-
-    //Manejar colisiones con la capa Default
-
-    //Es como chocar con objetos normales en el escenario.
 
     void OnCollisionEnter2D(Collision2D collision)
-
     {
-
         if (collision.gameObject.layer == LayerMask.NameToLayer("Default"))
-
         {
-
-            ChangeHealth(-1); //Reducir la salud en 1
-
+            ChangeHealth(-1); // üí• Recibe da√±o si colisiona con ciertos objetos
         }
-
     }
-
 }
